@@ -2,8 +2,7 @@ Ext.application({
     name : 'Fiddle',
 
     launch : function() {
-
-        Ext.define('User', {
+Ext.define('User', {
 extend: 'Ext.data.Model',
 fields: [{
 name: 'login',
@@ -17,17 +16,26 @@ type: 'string'
     type:'string'
 }]
 });
+var itemsPerPage = 5;
 var user = Ext.create('Ext.data.Store', {
 storeId: 'user',
 model: 'User',
-autoLoad: 'true',
+autoLoad: {start: 0, limit: 5},
+pageSize: itemsPerPage, // items per page
 proxy: {
             type: 'ajax',
             url : 'https://api.github.com/users/hadley/orgs',
-            reader: {type: 'json', root: 'users_data'}
+            reader: {type: 'json', root: 'users_data',totalProperty:'total'}
         }
 });
 
+// specify segment of data you want to load using params
+// store.load({
+//     params: {
+//         start: 0,
+//         limit: itemsPerPage
+//     }
+// });
 // Ext.create('Ext.form.Panel', {
 //     fullscreen: true,
 //     items: [
@@ -68,6 +76,12 @@ header:'URL',
 dataIndex:'url'
 }
 ],
+dockedItems: [{
+        xtype: 'pagingtoolbar',
+        store: user,   // same store GridPanel is using
+        dock: 'bottom',
+        displayInfo: true
+    }],
 minHeight: 300,
 width: 'auto',
 renderTo:document.body
